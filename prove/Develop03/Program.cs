@@ -3,43 +3,44 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 
 class Program
 {
     static void Main()
     {
-        var scripture = new Scripture("John 3:16","For God so loved the world that He gave His one and only begotten son, that whoever believes in Him shall not perish but have eternal Life.");
+        Scripture scripture = new Scripture("John 3:16", "For God So loved the world that He gave his one and only Son, that whosoever believes in Him shall not perish but have eternal life.");
 
-        
-        while (!scripture.IsHiddenCompletely)
+        Console.Clear();
+        scripture.DisplayScripture();
+
+        while(true)
         {
-            Console.Clear();
-            scripture.Display();
-            
-            Console.WriteLine("Press enter to continure or type 'quit' to exit or guess a word:");
+            Console.WriteLine("Press Enter to continue or type 'quit' to exit:");
 
-            string input = Console.ReadLine();
+            string userinput = Console.ReadLine();
 
-
-            if (string.IsNullOrEmpty(input)|| input.ToLower() == "quit")
+            if (userinput.ToLower() == "quit")
             {
                 break;
             }
-
-            if (scripture.CheckWord(input))
-            {
-                Console.WriteLine("Correct guess! Press enter to continue.");
-            }
             else
             {
-                Console.WriteLine("Incorrect guess. press Enter to continue.");
-            }
-            Console.ReadLine();
-             
-            scripture.HideRandomWords();
-        }
+                
+                Console.Clear();
+                scripture.HideWord();
+                scripture.DisplayScripture();
 
+                if (scripture.AllWordsHidden())
+                {
+                    Console.WriteLine("Congratulations! you have memeorized scripture.");
+                    
+                    break;
+                }
+
+            }
+        }
     }
 }
 
@@ -50,24 +51,22 @@ class Scripture
     private List<string> hiddenWords;
 
 
-
-    public bool IsHiddenCompletely => hiddenWords.Count == text.Split(' ').Length;
-
     public Scripture(string reference, string text)
     {
         this.reference = reference;
         this.text = text;
-        hiddenWords = new List<string>(); 
+        this.hiddenWords = new List<string>();
     }
-    public void Display()
-    {
-        Console.WriteLine($"{reference}\n");
 
-        foreach (var word in text.Split(' '))
+    public void DisplayScripture()
+    {
+        Console.WriteLine(reference);
+        string[] words = text.Split(' ');
+        foreach (string word in words)
         {
             if (hiddenWords.Contains(word))
             {
-                Console.Write("_____");
+                Console.Write("_______ ");
             }
             else
             {
@@ -77,20 +76,20 @@ class Scripture
         Console.WriteLine();
     }
 
-    public void HideRandomWords()
+    public void HideWord()
     {
-        Random rnd = new Random();
-
         string[] words = text.Split(' ');
+        Random rand = new Random();
 
-        int wordToHide = rnd.Next(words.Length);
+        int index = rand.Next(words.Length);
+        string wordToHide = words[index];
 
-        hiddenWords.Add(words[wordToHide]);
+        hiddenWords.Add(wordToHide);
     }
-    
-    public bool CheckWord(string guess)
+    public bool AllWordsHidden()
     {
-        return hiddenWords.Contains(guess);
+        string[] words = text.Split(' ');
+        return hiddenWords.Count == words.Length;
     }
 }
-    
+
